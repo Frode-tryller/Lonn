@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lønnskalkulator</title>
+
+<style>
+:root {
+  --bg: #f2f2f7;
+  --box: #ffffff;
+  --text: #000000;
+  --primary: #007aff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --box: #1c1c1e;
+    --text: #ffffff;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.box {
+  background: var(--box);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0 10px 0;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+}
+
+.result {
+  margin-top: 15px;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>💰 Lønnskalkulator</h1>
+
+<div class="box">
+  <h3>Grunnlønn</h3>
+  Timelønn <input id="timelonn" type="number">
+  Vanlige timer <input id="timer" type="number">
+</div>
+
+<div class="box">
+  <h3>Tillegg</h3>
+
+  <input placeholder="Navn tillegg 1" id="n1">
+  Timer <input id="t1" type="number">
+  Sats <input id="s1" type="number">
+
+  <input placeholder="Navn tillegg 2" id="n2">
+  Timer <input id="t2" type="number">
+  Sats <input id="s2" type="number">
+
+  <input placeholder="Navn tillegg 3" id="n3">
+  Timer <input id="t3" type="number">
+  Sats <input id="s3" type="number">
+
+  <input placeholder="Navn tillegg 4" id="n4">
+  Timer <input id="t4" type="number">
+  Sats <input id="s4" type="number">
+</div>
+
+<div class="box">
+  <h3>Skatt</h3>
+  Skatteprosent <input id="skatt" type="number" value="30">
+</div>
+
+<button onclick="beregn()">Regn ut og lagre</button>
+
+<div class="box result" id="resultat"></div>
+
+<script>
+function beregn() {
+  const grunn = (timelonn.value||0) * (timer.value||0);
+
+  const tillegg = [
+    {n:n1.value,t:t1.value,s:s1.value},
+    {n:n2.value,t:t2.value,s:s2.value},
+    {n:n3.value,t:t3.value,s:s3.value},
+    {n:n4.value,t:t4.value,s:s4.value}
+  ];
+
+  let tilleggSum = 0;
+  let detaljer = "";
+
+  tillegg.forEach(a => {
+    if(a.t && a.s) {
+      const sum = a.t * a.s;
+      tilleggSum += sum;
+      detaljer += `${a.n || "Tillegg"}: ${sum.toLocaleString("no-NO")} kr<br>`;
+    }
+  });
+
+  const brutto = grunn + tilleggSum;
+  const skattBelop = brutto * (skatt.value/100);
+  const netto = brutto - skattBelop;
+
+  resultat.innerHTML = `
+  <b>Detaljert oversikt</b><br><br>
+  Grunnlønn: ${grunn.toLocaleString("no-NO")} kr<br>
+  ${detaljer}
+  <hr>
+  Brutto: ${brutto.toLocaleString("no-NO")} kr<br>
+  Skatt: ${skattBelop.toLocaleString("no-NO")} kr<br>
+  <b>Netto: ${netto.toLocaleString("no-NO")} kr</b>
+  `;
+
+  localStorage.setItem(new Date().toISOString(), resultat.innerHTML);
+}
+</script>
+
+</body>
+</html>
